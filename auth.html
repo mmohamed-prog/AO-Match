@@ -490,7 +490,7 @@ async function doLogin() {
     showAlert('login-alert', msg);
   } else {
     showSuccess('Connexion réussie !', `Bienvenue ${data.user.email}. Redirection vers votre tableau de bord…`);
-    setTimeout(() => { window.location.href = '/ao-match-platform.html'; }, 1500);
+    setTimeout(() => { window.location.href = '/'; }, 1500);
   }
 }
 
