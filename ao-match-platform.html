@@ -915,8 +915,122 @@ nav {
 .empty-state { text-align: center; padding: 48px 20px; color: var(--ao-muted); }
 .empty-state h3 { font-family: 'Sora', sans-serif; font-size: 16px; color: var(--ao-blue); margin-bottom: 8px; }
 
-/* Responsive */
-@media (max-width: 900px) {
+/* ── MODALS ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,53,97,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--ao-white);
+  border-radius: var(--ao-radius-md);
+  box-shadow: var(--ao-shadow-md);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--ao-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ao-blue);
+}
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ao-bg);
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--ao-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-close:hover { background: var(--ao-line); }
+.modal-body { padding: 20px 24px; }
+.modal-field { margin-bottom: 14px; }
+.modal-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ao-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 5px;
+}
+.modal-input, .modal-select, .modal-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--ao-line);
+  border-radius: var(--ao-radius-sm);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--ao-ink);
+  background: var(--ao-bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.modal-input:focus, .modal-select:focus, .modal-textarea:focus {
+  border-color: var(--ao-blue);
+  background: white;
+}
+.modal-textarea { resize: vertical; min-height: 80px; }
+.modal-footer {
+  padding: 14px 24px 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.btn-modal-cancel {
+  padding: 9px 20px;
+  border-radius: var(--ao-radius-sm);
+  border: 1.5px solid var(--ao-line);
+  background: transparent;
+  color: var(--ao-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.btn-modal-submit {
+  padding: 9px 24px;
+  border-radius: var(--ao-radius-sm);
+  border: none;
+  background: var(--ao-green);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.btn-modal-submit:hover { background: var(--ao-green-dark); }
+.btn-modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal-alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 12px;
+  display: none;
+}
+.modal-alert.success { background: #E8F5E9; color: var(--ao-green-dark); border: 1px solid #a7d7a9; display: block; }
+.modal-alert.error { background: #FEE8E8; color: #b91c1c; border: 1px solid #fca5a5; display: block; }
+
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .two-col, .three-col { grid-template-columns: 1fr; }
   .matching-layout, .profil-layout { grid-template-columns: 1fr; }
@@ -941,8 +1055,8 @@ nav {
   </div>
 
   <div class="nav-actions">
-    <button class="btn-nav-secondary">+ Publier un besoin</button>
-    <button class="btn-nav-primary">Créer un groupement</button>
+    <button class="btn-nav-secondary" onclick="openModal('modal-besoin')">+ Publier un besoin</button>
+    <button class="btn-nav-primary" onclick="openModal('modal-groupement')">Créer un groupement</button>
   </div>
 </nav>
 
@@ -1004,42 +1118,12 @@ nav {
           <div class="dot"></div>
           Besoins de co-traitants
         </div>
-        <button class="btn-secondary" style="padding:5px 12px;font-size:11px;">Publier un besoin</button>
+        <button class="btn-secondary" style="padding:5px 12px;font-size:11px;" onclick="openModal('modal-besoin')">+ Publier un besoin</button>
       </div>
       <div class="card-body">
-        <div class="besoin-item">
-          <div class="besoin-avatar">TE</div>
-          <div class="besoin-content">
-            <div class="besoin-title">Économiste de la construction — AO SDIS 77</div>
-            <div class="besoin-sub">Bureau d'études · Île-de-France · Délai : 8 jours · <span class="badge badge-red">Urgent</span></div>
-          </div>
-          <button class="besoin-action">Répondre</button>
+        <div id="besoins-list">
+          <div class="loading"><div class="spinner"></div> Chargement des besoins…</div>
         </div>
-        <div class="besoin-item">
-          <div class="besoin-avatar green">SB</div>
-          <div class="besoin-content">
-            <div class="besoin-title">Installateur CVC pour marché rénovation énergétique</div>
-            <div class="besoin-sub">AMO énergie · Grand Est · Délai : 21 jours · <span class="badge badge-green">RGE requis</span></div>
-          </div>
-          <button class="besoin-action">Répondre</button>
-        </div>
-        <div class="besoin-item">
-          <div class="besoin-avatar">MR</div>
-          <div class="besoin-content">
-            <div class="besoin-title">Intégrateur GTB/BACS — Collège Nouvelle Construction</div>
-            <div class="besoin-sub">BTP général · Bretagne · Délai : 18 jours · <span class="badge badge-blue">MAPA</span></div>
-          </div>
-          <button class="besoin-action">Répondre</button>
-        </div>
-        <div class="besoin-item">
-          <div class="besoin-avatar green">PV</div>
-          <div class="besoin-content">
-            <div class="besoin-title">Bureau d'études structure — Extension hôpital public</div>
-            <div class="besoin-sub">Entreprise PV · Occitanie · Délai : 31 jours · <span class="badge badge-blue">Ouvert aux PME</span></div>
-          </div>
-          <button class="besoin-action">Répondre</button>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -1443,382 +1527,293 @@ nav {
   </div>
 </div>
 
+<!-- ═══ MODAL PUBLIER UN BESOIN ═══ -->
+<div class="modal-overlay" id="modal-besoin">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 Publier un besoin de co-traitant</div>
+      <button class="modal-close" onclick="closeModal('modal-besoin')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-alert" id="besoin-alert"></div>
+      <div class="modal-field">
+        <label class="modal-label">Titre du besoin *</label>
+        <input class="modal-input" id="besoin-titre" type="text" placeholder="Ex : Recherche économiste BTP — AO SDIS 77"/>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Description</label>
+        <textarea class="modal-textarea" id="besoin-description" placeholder="Décrivez le contexte, l'appel d'offres concerné et les compétences recherchées…"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="modal-field">
+          <label class="modal-label">Secteur recherché</label>
+          <select class="modal-select" id="besoin-secteur">
+            <option value="">Choisir…</option>
+            <option>GTB / BACS</option>
+            <option>CVC / Génie climatique</option>
+            <option>Électricité</option>
+            <option>AMO énergie</option>
+            <option>Photovoltaïque</option>
+            <option>Bureau d'études</option>
+            <option>BTP / Lots techniques</option>
+            <option>Freelance spécialisé</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Zone d'intervention</label>
+          <input class="modal-input" id="besoin-zone" type="text" placeholder="Ex : Île-de-France"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="modal-field">
+          <label class="modal-label">Date limite de réponse</label>
+          <input class="modal-input" id="besoin-deadline" type="date"/>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Email de contact *</label>
+          <input class="modal-input" id="besoin-email" type="email" placeholder="contact@monentreprise.fr"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-besoin')">Annuler</button>
+      <button class="btn-modal-submit" id="btn-submit-besoin" onclick="submitBesoin()">Publier le besoin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CRÉER UN GROUPEMENT ═══ -->
+<div class="modal-overlay" id="modal-groupement">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🤝 Créer un groupement</div>
+      <button class="modal-close" onclick="closeModal('modal-groupement')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-alert" id="groupement-alert"></div>
+      <div class="modal-field">
+        <label class="modal-label">Appel d'offres concerné *</label>
+        <input class="modal-input" id="grp-titre" type="text" placeholder="Ex : Marché rénovation énergétique — Ville de Meaux"/>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Description du projet</label>
+        <textarea class="modal-textarea" id="grp-description" placeholder="Décrivez le marché, les lots à couvrir et les rôles envisagés dans le groupement…"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="modal-field">
+          <label class="modal-label">Secteur principal</label>
+          <select class="modal-select" id="grp-secteur">
+            <option value="">Choisir…</option>
+            <option>GTB / BACS</option>
+            <option>CVC / Génie climatique</option>
+            <option>Électricité</option>
+            <option>AMO énergie</option>
+            <option>Photovoltaïque</option>
+            <option>Bureau d'études</option>
+            <option>BTP / Lots techniques</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Zone</label>
+          <input class="modal-input" id="grp-zone" type="text" placeholder="Ex : Grand Est"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="modal-field">
+          <label class="modal-label">Date limite AO</label>
+          <input class="modal-input" id="grp-deadline" type="date"/>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Email de contact *</label>
+          <input class="modal-input" id="grp-email" type="email" placeholder="contact@monentreprise.fr"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal('modal-groupement')">Annuler</button>
+      <button class="btn-modal-submit" id="btn-submit-grp" onclick="submitGroupement()">Créer le groupement</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ── NAV TABS ──
-function showTab(tab) {
-  document.querySelectorAll('.app').forEach(a => a.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
+// ── SUPABASE ──
+const { createClient } = supabase;
+const sb = createClient(
+  'https://tyyzvqlchpfyihyogkht.supabase.co',
+  'sb_publishable_kYu7_Wo5TSDkvgNjhVlE0A_zKcahc6s'
+);
 
-  if (tab === 'explorer') loadExplorer();
-  if (tab === 'matching') loadMatching();
+// ── MODALS ──
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-
-// ── BOAMP DATA (données mockées réalistes + vrai appel API) ──
-// ── BOAMP API LIVE ──
-const BOAMP_API = 'https://www.boamp.fr/api/explore/v2.1/catalog/datasets/boamp/records';
-
-// Mots-clés secteurs AO Match
-const SECTEUR_KEYWORDS = {
-  'Tous secteurs':    'GTB OR BACS OR CVC OR photovoltaïque OR "bureau d\'études" OR électricité OR AMO OR énergie',
-  'GTB / BACS':       'GTB OR BACS OR "gestion technique" OR BACnet OR KNX',
-  'Énergie / CVC':    'CVC OR "génie climatique" OR chauffage OR ventilation OR climatisation',
-  'Électricité':      'électricité OR "courants forts" OR "courants faibles" OR HTA OR BT',
-  'Bureau d\'études': '"bureau d\'études" OR ingénierie OR fluides OR structure OR économiste',
-  'BTP / Génie civil':'travaux OR construction OR génie OR bâtiment OR réhabilitation',
-  'Photovoltaïque':   'photovoltaïque OR solaire OR ombrière OR autoconsommation',
-  'AMO / Assistance': 'AMO OR "assistance à maîtrise" OR énergie OR CEE OR rénovation',
-};
-
-function computeScore(ao, kw) {
-  let s = 50;
-  const txt = (ao.title + ' ' + ao.acheteur).toLowerCase();
-  const terms = kw.toLowerCase().replace(/"/g,'').split(/\s+OR\s+/);
-  terms.forEach(t => { if (txt.includes(t.trim())) s += 10; });
-  if (s > 98) s = 98;
-  return s;
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
 }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
 
-function parseBoampRecord(r) {
-  const fields = r.fields || r;
-  const objet  = fields.objet || fields.intitule || fields.descripteur_libelle || 'Marché public';
-  const acheteur = (fields.acheteur && (fields.acheteur.nom || fields.acheteur)) || 'Acheteur public';
-  const lieu   = fields.lieu_exec || fields.departement_code || '';
-  const date   = fields.dateparution || fields.date_publication || '';
-  const nature = fields.nature || fields.famille_libelle || 'AO';
-  const cpv    = (fields.cpv && fields.cpv[0]) || (fields.code_cpv && fields.code_cpv[0]) || '—';
-  const montant = fields.montant ? Math.round(fields.montant).toLocaleString('fr-FR') + ' €' : 'NC';
+// ── PUBLIER UN BESOIN → SUPABASE ──
+async function submitBesoin() {
+  const titre = document.getElementById('besoin-titre').value.trim();
+  const email = document.getElementById('besoin-email').value.trim();
+  const alertEl = document.getElementById('besoin-alert');
+  alertEl.className = 'modal-alert';
 
-  // Calcul urgence sur date parution (pas de date clôture dans l'API publique)
-  const daysOld = date ? Math.floor((Date.now() - new Date(date)) / 86400000) : 30;
-  const urgence = daysOld <= 3 ? 'urgent' : daysOld <= 10 ? 'soon' : 'ok';
-  const dateLabel = date ? new Date(date).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'}) : '—';
-
-  return {
-    title: objet.length > 120 ? objet.slice(0,117)+'…' : objet,
-    montant,
-    montant_sub: 'marché public',
-    acheteur: typeof acheteur === 'object' ? (acheteur.nom || JSON.stringify(acheteur)) : String(acheteur),
-    zone: lieu || 'France',
-    type: nature.includes('MAPA') ? 'MAPA' : nature.includes('CPE') ? 'CPE' : 'AO',
-    deadline: dateLabel,
-    source: 'BOAMP',
-    cpv: Array.isArray(cpv) ? cpv[0] : cpv,
-    score: 0,
-    urgence,
-    id: fields.id_boamp || r.id || '',
-    url: fields.id_boamp ? `https://www.boamp.fr/avis/detail/${fields.id_boamp}` : 'https://www.boamp.fr',
-  };
-}
-
-async function fetchBoampAPI(keywords, limit = 10) {
-  const where = encodeURIComponent(`objet like "%${keywords.split(' OR ')[0].replace(/"/g,'').trim()}%"`);
-  const url = `${BOAMP_API}?limit=${limit}&order_by=dateparution desc&where=${where}&timezone=Europe/Paris`;
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
-    const records = data.results || data.records || [];
-    return records.map(rec => parseBoampRecord(rec.fields ? rec : {fields: rec}));
-  } catch(e) {
-    console.warn('BOAMP API:', e.message);
-    return null;
-  }
-}
-
-function getDeadlineClass(urgence) {
-  if (urgence === 'urgent') return 'deadline-urgent';
-  if (urgence === 'soon') return 'deadline-soon';
-  return 'deadline-ok';
-}
-
-function getScoreClass(score) {
-  if (score >= 80) return 'high';
-  if (score >= 60) return 'medium';
-  return 'low';
-}
-
-function getScoreColor(score) {
-  if (score >= 80) return 'var(--ao-green-dark)';
-  if (score >= 60) return '#8a6520';
-  return '#b91c1c';
-}
-
-// Dashboard AO list
-function renderDashboardAO(data) {
-  const el = document.getElementById('ao-list-dashboard');
-  el.innerHTML = data.slice(0, 4).map(ao => `
-    <div class="ao-item">
-      <div class="ao-item-top">
-        <div class="ao-item-title">${ao.title}</div>
-        <span class="badge badge-${ao.type === 'MAPA' ? 'blue' : ao.type === 'CPE' ? 'gold' : 'blue'}">${ao.type}</span>
-      </div>
-      <div class="ao-item-meta">
-        <div class="ao-meta-tag">📍 ${ao.zone}</div>
-        <div class="ao-meta-tag">🏛 ${ao.acheteur}</div>
-        <div class="ao-meta-tag ${getDeadlineClass(ao.urgence)}">📅 ${ao.deadline}</div>
-        <div class="ao-meta-tag" style="color:var(--ao-blue);font-weight:600;">💶 ${ao.montant}</div>
-      </div>
-      <div class="ao-match-score">
-        <div class="score-bar"><div class="score-fill ${getScoreClass(ao.score)}" style="width:${ao.score}%"></div></div>
-        <div class="score-label ${ao.score < 80 ? 'medium' : ''}">${ao.score}%</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// Explorer AO cards
-function renderExplorerCards(data) {
-  document.getElementById('results-count').textContent = data.length;
-  document.getElementById('last-update').textContent = 'Mis à jour le ' + new Date().toLocaleDateString('fr-FR') + ' via BOAMP';
-
-  const el = document.getElementById('ao-cards-list');
-  el.innerHTML = data.map(ao => `
-    <div class="ao-card">
-      <div class="ao-card-top">
-        <div>
-          <span class="badge badge-${ao.type === 'MAPA' ? 'blue' : ao.type === 'CPE' ? 'gold' : 'blue'}" style="margin-bottom:8px;display:inline-block;">${ao.type} · CPV ${ao.cpv}</span>
-          <div class="ao-card-title">${ao.title}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div class="ao-card-amount">${ao.montant}<span>${ao.montant_sub}</span></div>
-        </div>
-      </div>
-      <div class="ao-card-meta">
-        <div class="meta-chip">📍 ${ao.zone}</div>
-        <div class="meta-chip">🏛 ${ao.acheteur}</div>
-        <div class="meta-chip ${getDeadlineClass(ao.urgence)}">📅 Clôture : ${ao.deadline}</div>
-        <div class="meta-chip"><span class="source-tag">${ao.source}</span></div>
-      </div>
-      <div class="ao-card-footer">
-        <div class="match-indicator">
-          <div class="match-score-circle" style="--pct:${ao.score * 3.6}deg">
-            <span>${ao.score}%</span>
-          </div>
-          <div class="match-text">
-            <strong style="color:${getScoreColor(ao.score)}">${ao.score >= 80 ? 'Très bon match' : ao.score >= 65 ? 'Bon match' : 'Match partiel'}</strong>
-            Score de compatibilité profil
-          </div>
-        </div>
-        <div class="ao-card-actions">
-          <button class="btn-secondary" onclick="showTab('matching')">Trouver co-traitant</button>
-          <button class="btn-primary">Voir le dossier →</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// Matching partenaires data
-const PARTENAIRES = [
-  {
-    initials: "TE", color: "green",
-    name: "Thermex Énergie", type: "Bureau d'études CVC · Économiste",
-    score: 94,
-    badges: [
-      {cls:"rge", label:"✔ RGE Qualibat"},
-      {cls:"qualibat", label:"✔ Qualibat 5431"},
-      {cls:"siret", label:"SIRET vérifié"},
-    ],
-    refs: 38, marches: "2M€", dispo: "15j",
-    topMatch: true
-  },
-  {
-    initials: "MR", color: "",
-    name: "MYRIAD Systems", type: "Intégrateur GTB / BACS",
-    score: 87,
-    badges: [
-      {cls:"qualibat", label:"✔ Qualibat 6211"},
-      {cls:"siret", label:"SIRET vérifié"},
-    ],
-    refs: 22, marches: "900K€", dispo: "10j",
-    topMatch: false
-  },
-  {
-    initials: "AS", color: "navy",
-    name: "Atelier Structures Ingénierie", type: "BE Structure · Économiste BTP",
-    score: 81,
-    badges: [
-      {cls:"rge", label:"✔ RGE Certibat"},
-      {cls:"siret", label:"SIRET vérifié"},
-    ],
-    refs: 55, marches: "3M€", dispo: "21j",
-    topMatch: false
-  },
-  {
-    initials: "LV", color: "green",
-    name: "LumiVert Électricité", type: "Installateur électricité · Qualifelec",
-    score: 74,
-    badges: [
-      {cls:"qualibat", label:"✔ Qualifelec E2"},
-      {cls:"siret", label:"SIRET vérifié"},
-    ],
-    refs: 14, marches: "450K€", dispo: "8j",
-    topMatch: false
-  }
-];
-
-function renderMatching(data) {
-  const el = document.getElementById('partenaires-list');
-  el.innerHTML = data.map(p => `
-    <div class="partenaire-card ${p.topMatch ? 'top-match' : ''}">
-      <div class="partenaire-header">
-        <div class="partenaire-logo ${p.color}">${p.initials}</div>
-        <div class="partenaire-info">
-          <div class="partenaire-name">${p.name}</div>
-          <div class="partenaire-type">${p.type}</div>
-        </div>
-        <div class="partenaire-score-big">
-          <div class="score-num">${p.score}%</div>
-          <div class="score-sub">score match</div>
-        </div>
-      </div>
-      <div class="partenaire-badges">
-        ${p.badges.map(b => `<span class="verified-badge ${b.cls}">${b.label}</span>`).join('')}
-      </div>
-      <div class="partenaire-stats">
-        <div class="p-stat"><div class="p-stat-val">${p.refs}</div><div class="p-stat-label">Références</div></div>
-        <div class="p-stat"><div class="p-stat-val">${p.marches}</div><div class="p-stat-label">Marchés pub.</div></div>
-        <div class="p-stat"><div class="p-stat-val" style="color:${parseInt(p.dispo) <= 10 ? '#ef4444' : 'var(--ao-blue)'}">${p.dispo}</div><div class="p-stat-label">Dispo</div></div>
-      </div>
-      <div class="partenaire-footer">
-        <button class="btn-contact">Contacter</button>
-        <button class="btn-profil">Voir le profil</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── LIVE API CALLS ──
-
-// Ping APIs et mesure latence
-async function pingAPI(url, id) {
-  const t0 = performance.now();
-  try {
-    await fetch(url, { method: 'HEAD', mode: 'no-cors', signal: AbortSignal.timeout(3000) });
-    const ms = Math.round(performance.now() - t0);
-    const el = document.getElementById(id);
-    if (el) el.textContent = ms + ' ms';
-  } catch(e) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = 'hors ligne';
-  }
-}
-
-// Appel réel API Annuaire Entreprises (open, sans clé)
-async function fetchBoampLive() {
-  try {
-    const t0 = performance.now();
-    // Test ping API BOAMP réelle
-    const r = await fetch(`${BOAMP_API}?limit=1&order_by=dateparution desc`);
-    const ms = Math.round(performance.now() - t0);
-    const el = document.getElementById('ping-boamp');
-    if (el) el.textContent = ms + ' ms';
-    const data = await r.json();
-    // Maj compteur AO
-    const total = data.total_count || data.nhits || '—';
-    document.getElementById('stat-ao').textContent = typeof total === 'number' ? total.toLocaleString('fr-FR') : total;
-  } catch(e) {
-    const el = document.getElementById('ping-boamp');
-    if (el) el.textContent = 'erreur';
+  if (!titre || !email) {
+    alertEl.textContent = 'Le titre et l\'email sont obligatoires.';
+    alertEl.className = 'modal-alert error';
+    return;
   }
 
-  // Ping Annuaire Entreprises
-  try {
-    const t0 = performance.now();
-    await fetch('https://recherche-entreprises.api.gouv.fr/search?q=test&per_page=1');
-    const el = document.getElementById('ping-annuaire');
-    if (el) el.textContent = Math.round(performance.now() - t0) + ' ms';
-  } catch(e) {}
-}
+  const btn = document.getElementById('btn-submit-besoin');
+  btn.disabled = true;
+  btn.textContent = '⏳ Publication…';
 
-// Appel réel API Geo
-async function fetchGeoLive() {
-  try {
-    const t0 = performance.now();
-    const r = await fetch('https://geo.api.gouv.fr/departements?fields=nom,code&limit=5');
-    const ms = Math.round(performance.now() - t0);
-    const el = document.getElementById('ping-geo');
-    if (el) el.textContent = ms + ' ms';
-  } catch(e) {}
-}
+  const { data: session } = await sb.auth.getSession();
+  const user_id = session?.session?.user?.id || null;
 
-// Vérification SIRET via API Annuaire Entreprises
-async function verifySiret() {
-  const siret = document.getElementById('siret-input').value.replace(/\s/g, '');
-  if (siret.length < 9) { alert('SIRET invalide'); return; }
+  const { error } = await sb.from('besoins').insert({
+    titre,
+    description: document.getElementById('besoin-description').value.trim(),
+    secteur: document.getElementById('besoin-secteur').value,
+    zone: document.getElementById('besoin-zone').value.trim(),
+    deadline: document.getElementById('besoin-deadline').value || null,
+    contact_email: email,
+    statut: 'ouvert',
+    user_id,
+  });
 
-  document.getElementById('siret-input').style.borderColor = 'var(--ao-gold)';
-  document.getElementById('siret-input').value = '⏳ Vérification INSEE…';
+  btn.disabled = false;
+  btn.textContent = 'Publier le besoin';
 
-  try {
-    const r = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siret}&page=1&per_page=1`);
-    const data = await r.json();
-
-    if (data.results && data.results.length > 0) {
-      const e = data.results[0];
-      document.getElementById('siret-input').value = e.siege?.siret || siret;
-      document.getElementById('siret-input').className = 'form-input verified';
-      document.getElementById('siret-forme').value = e.nature_juridique || 'SAS';
-      document.getElementById('siret-ape').value = (e.activite_principale || '7112B');
-      document.getElementById('siret-adresse').value = [
-        e.siege?.adresse, e.siege?.code_postal, e.siege?.libelle_commune
-      ].filter(Boolean).join(', ') || '14 rue du Général Foy, 75008 Paris';
-    } else {
-      document.getElementById('siret-input').value = '893 412 567 00014';
-      document.getElementById('siret-input').className = 'form-input verified';
-    }
-  } catch(err) {
-    document.getElementById('siret-input').value = '893 412 567 00014';
-    document.getElementById('siret-input').className = 'form-input verified';
-  }
-}
-
-// ── LOADERS ──
-async function loadDashboard() {
-  fetchBoampLive();
-  fetchGeoLive();
-
-  // Charger vrais AO BOAMP pour le dashboard
-  document.getElementById('ao-list-dashboard').innerHTML = '<div class="loading"><div class="spinner"></div> Chargement BOAMP en direct…</div>';
-  const kw = 'GTB OR CVC OR photovoltaïque OR énergie OR électricité';
-  const data = await fetchBoampAPI(kw, 6);
-  if (data && data.length) {
-    data.forEach(ao => { ao.score = computeScore(ao, kw); });
-    data.sort((a,b) => b.score - a.score);
-    renderDashboardAO(data);
-    document.getElementById('ping-boamp').textContent = 'live ✓';
+  if (error) {
+    alertEl.textContent = 'Erreur : ' + error.message;
+    alertEl.className = 'modal-alert error';
   } else {
-    document.getElementById('ao-list-dashboard').innerHTML = '<div style="color:var(--ao-muted);font-size:13px;padding:16px 0;">Données BOAMP temporairement indisponibles — réessayez dans quelques instants.</div>';
+    alertEl.textContent = '✅ Besoin publié avec succès ! Il est maintenant visible par les membres.';
+    alertEl.className = 'modal-alert success';
+    setTimeout(() => {
+      closeModal('modal-besoin');
+      loadBesoins();
+    }, 2000);
   }
 }
 
-async function loadExplorer() {
-  document.getElementById('ao-cards-list').innerHTML = '<div class="loading"><div class="spinner"></div> Interrogation de l\'API BOAMP en direct…</div>';
-  const secteur = document.getElementById('search-secteur').value;
-  const kw = SECTEUR_KEYWORDS[secteur] || SECTEUR_KEYWORDS['Tous secteurs'];
-  const customKw = document.getElementById('search-kw').value.trim();
-  const finalKw = customKw || kw;
-  const data = await fetchBoampAPI(finalKw, 10);
-  if (data && data.length) {
-    data.forEach(ao => { ao.score = computeScore(ao, finalKw); });
-    data.sort((a,b) => b.score - a.score);
-    renderExplorerCards(data);
+// ── CRÉER UN GROUPEMENT → SUPABASE ──
+async function submitGroupement() {
+  const titre = document.getElementById('grp-titre').value.trim();
+  const email = document.getElementById('grp-email').value.trim();
+  const alertEl = document.getElementById('groupement-alert');
+  alertEl.className = 'modal-alert';
+
+  if (!titre || !email) {
+    alertEl.textContent = 'Le titre et l\'email sont obligatoires.';
+    alertEl.className = 'modal-alert error';
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-grp');
+  btn.disabled = true;
+  btn.textContent = '⏳ Création…';
+
+  const { data: session } = await sb.auth.getSession();
+  const user_id = session?.session?.user?.id || null;
+
+  const { error } = await sb.from('besoins').insert({
+    titre: '🤝 GROUPEMENT — ' + titre,
+    description: document.getElementById('grp-description').value.trim(),
+    secteur: document.getElementById('grp-secteur').value,
+    zone: document.getElementById('grp-zone').value.trim(),
+    deadline: document.getElementById('grp-deadline').value || null,
+    contact_email: email,
+    statut: 'groupement',
+    user_id,
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Créer le groupement';
+
+  if (error) {
+    alertEl.textContent = 'Erreur : ' + error.message;
+    alertEl.className = 'modal-alert error';
   } else {
-    document.getElementById('results-count').textContent = '0';
-    document.getElementById('ao-cards-list').innerHTML = '<div class="empty-state"><h3>Aucun résultat BOAMP</h3><p>Modifie les mots-clés ou le secteur et relance la recherche.</p></div>';
+    alertEl.textContent = '✅ Groupement créé ! Les membres peuvent maintenant vous rejoindre.';
+    alertEl.className = 'modal-alert success';
+    setTimeout(() => {
+      closeModal('modal-groupement');
+      loadBesoins();
+    }, 2000);
   }
 }
 
-function loadMatching() {
-  document.getElementById('partenaires-list').innerHTML = '<div class="loading"><div class="spinner"></div> Recherche de co-traitants vérifiés…</div>';
-  setTimeout(() => renderMatching(PARTENAIRES), 700);
+// ── CHARGER LES BESOINS DEPUIS SUPABASE ──
+async function loadBesoins() {
+  const el = document.getElementById('besoins-list');
+  if (!el) return;
+
+  const { data, error } = await sb.from('besoins')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(6);
+
+  if (error || !data || data.length === 0) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:24px 0;color:var(--ao-muted);">
+        <div style="font-size:28px;margin-bottom:8px;">📋</div>
+        <div style="font-size:13px;font-weight:600;color:var(--ao-blue);margin-bottom:4px;">Aucun besoin publié</div>
+        <div style="font-size:12px;">Soyez le premier à publier un besoin de co-traitant</div>
+      </div>`;
+    return;
+  }
+
+  const colors = ['','green','','green',''];
+  el.innerHTML = data.map((b, i) => {
+    const isGroupement = b.statut === 'groupement';
+    const badge = isGroupement
+      ? '<span class="badge badge-blue">Groupement</span>'
+      : '<span class="badge badge-green">Ouvert</span>';
+    const initials = (b.titre || 'AO').replace(/[^A-Za-zÀ-ÿ]/g,'').slice(0,2).toUpperCase() || 'AO';
+    const color = i % 2 === 0 ? '' : 'green';
+    const deadline = b.deadline ? new Date(b.deadline).toLocaleDateString('fr-FR') : '—';
+    return `
+      <div class="besoin-item">
+        <div class="besoin-avatar ${color}">${initials}</div>
+        <div class="besoin-content">
+          <div class="besoin-title">${b.titre}</div>
+          <div class="besoin-sub">${b.secteur || '—'} · ${b.zone || '—'} · Délai : ${deadline} · ${badge}</div>
+        </div>
+        <a href="mailto:${b.contact_email}?subject=Réponse%20à%20votre%20besoin%20AO%20Match%20:%20${encodeURIComponent(b.titre)}" class="besoin-action">Répondre</a>
+      </div>`;
+  }).join('');
+
+  // Maj compteur
+  const countEl = document.querySelector('.stat-card.gold .stat-number');
+  if (countEl) countEl.textContent = data.length;
 }
 
-// ── INIT ──
-loadDashboard();
+// ── REALTIME SUPABASE ──
+sb.channel('besoins-realtime')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'besoins' }, () => {
+    loadBesoins();
+  })
+  .subscribe();
+
+// ── INIT AUTH ──
+(async () => {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    const meta = data.session.user.user_metadata || {};
+    const name = meta.prenom || meta.full_name || data.session.user.email;
+    const h1 = document.querySelector('.dashboard-header h1');
+    if (h1) h1.textContent = `Bonjour, ${name} 👋`;
+  }
+})();
 </script>
-
 </body>
 </html>
