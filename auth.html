@@ -36,7 +36,7 @@ body {
   padding: 24px;
 }
 
-/* Logo */
+* Logo *
 .logo {
   display: flex;
   align-items: center;
@@ -71,7 +71,7 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Card */
+* Card *
 .card {
   background: var(--ao-white);
   border-radius: var(--radius-md);
@@ -81,7 +81,7 @@ body {
   overflow: hidden;
 }
 
-/* Tabs */
+* Tabs *
 .tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -106,7 +106,7 @@ body {
   background: rgba(6,53,97,0.03);
 }
 
-/* Form */
+* Form *
 .form-body { padding: 28px; }
 
 .form-title {
@@ -205,7 +205,7 @@ body {
   background: var(--ao-line);
 }
 
-/* Alert */
+* Alert *
 .alert {
   padding: 12px 14px;
   border-radius: 8px;
@@ -217,7 +217,7 @@ body {
 .alert.success { background: #E8F5E9; color: var(--ao-green-dark); border: 1px solid #a7d7a9; display: block; }
 .alert.info { background: #EBF0F7; color: var(--ao-blue); border: 1px solid #bdd0e8; display: block; }
 
-/* Spinner */
+* Spinner *
 .spinner {
   width: 16px; height: 16px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -490,7 +490,7 @@ async function doLogin() {
     showAlert('login-alert', msg);
   } else {
     showSuccess('Connexion réussie !', `Bienvenue ${data.user.email}. Redirection vers votre tableau de bord…`);
-    setTimeout(() => { window.location.href = '/'; }, 1500);
+    setTimeout(() => { window.location.href = '/ao-match-platform.html'; }, 1500);
   }
 }
 
